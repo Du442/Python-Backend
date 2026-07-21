@@ -1,1 +1,1 @@
-# Alura Python backend courses
+# Python backend studies
