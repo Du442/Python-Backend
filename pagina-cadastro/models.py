@@ -1,4 +1,3 @@
-from enum import auto
 from sqlalchemy import \
     Column, Integer, String, ForeignKey, column
 from db import Base
