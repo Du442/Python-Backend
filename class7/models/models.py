@@ -1,4 +1,3 @@
-from re import T
 from sqlalchemy import \
     Column, String, Integer, ForeignKey
 from sqlalchemy import relationship
@@ -10,7 +9,10 @@ class Student(Base):
     name = Column(String, nullable=False)
     email = Column(String)
     profile = relationship(
-        "Profile", back_populates="Student", uselist=False, cascade="all, delete-orphan"
+        "profile", back_populates="student", uselist=False, cascade="all, delete-orphan"
+    )
+    disciplines = relationship(
+        "disciplines", back_populates="student", secondary='matriculations'
     )
 
 class Profile(Base):
@@ -26,10 +28,19 @@ class Profile(Base):
 class Teachers(Base):
     __tablename__ = 'teachers'
     id = Column(Integer, primary_key=True, index=True)
-    teacher_name = Column(String, nullable=False)
-    
+    teacher = Column(String, nullable=False)
+    disciplines = relationship(
+        "Disciplines", back_populates="Teachers"
+    )
 
 class Disciplines(Base):
     __tablename__ = 'disciplines'
     id = Column(Integer, primary_key=True, index=True)
-    discipline_name = Column(String, nullable=False)
+    discipline = Column(String, nullable=False)
+    teacher_id = Column(Integer, ForeignKey("teachers.id"))
+
+class Matriculation(Base):
+    __tablename__ = 'matriculations'
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey('students.id'))
+    discipline_id = Column(Integer, ForeignKey('disciplines.id'))
