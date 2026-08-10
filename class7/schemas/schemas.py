@@ -29,8 +29,27 @@ class CreateStudent(BaseModel):
     email: str
     profile: CreateProfile
 
-class Teacher(BaseModel):
+class Discipline(BaseModel):
     id: int
+    discipline: str
+    description: str
+
+class DisciplineCreate(BaseModel):
+    discipline: str
+    description: str
+
+class Matriculation(BaseModel):
+    student_id: int
+    discipline_id: int
+
+    class Config:
+        from_attributes = True
+
+class MatriculationCreate(BaseModel):
+    student_id: int
+    discipline_id: int
+
+class Teacher(BaseModel):
     teacher: str
 
     class Config:
@@ -38,4 +57,3 @@ class Teacher(BaseModel):
 
 class CreateTeacher(BaseModel):
     teacher: str
-    disciplines: Optional[Teachers] = None
