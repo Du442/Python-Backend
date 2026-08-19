@@ -48,7 +48,15 @@ def get_products():
 @main_bp.route('/products', methods=['POST'])
 @token_required
 def create_product(token):
-    return jsonify({'message': 'Create products route'})
+    try:
+        product = Product(**request.get_json())
+    except ValidationError as e:
+        return jsonify({'error': e.errors()})
+
+    result = db.products.insert_one(product.model_dump())
+
+    return jsonify({'message': 'The product has been created',
+                    'id': str(result.inserted_id)}), 201
 
 # FR: The system must allow viewing the details of a single product.
 @main_bp.route('/product/<string:product_id>', methods=['GET'])
