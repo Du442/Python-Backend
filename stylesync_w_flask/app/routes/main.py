@@ -1,12 +1,14 @@
 from flask import Blueprint, jsonify, request
+from app import db
 from app.models.user import LoginPayload
 from pydantic import ValidationError
+from bson import ObjectId
 
 main_bp = Blueprint('main_bp', __name__)
 
 # FR: The system must allow a user to authenticate using a token.
 # check next day
-@main_bp.route('/login', methods=['POST'])
+@main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     try:
         raw_data = request.get_json()
@@ -25,7 +27,13 @@ def login():
 # FR: The system must allow the listing of all products.
 @main_bp.route('/products', methods=['GET'])
 def get_products():
-    return jsonify({'message': 'Products list route'})
+    products_cursor = db.products.find({})
+    products_list = []
+    for products in products_cursor:
+        products['_id'] = str(products['_id'])
+        products_list.append(products)
+
+    return jsonify(products_list)
 
 # FR: The system must allow the creation of a new product.
 @main_bp.route('/products', methods=['POST'])
@@ -33,9 +41,21 @@ def create_product():
     return jsonify({'message': 'Create products route'})
 
 # FR: The system must allow viewing the details of a single product.
-@main_bp.route('/product/<int:product_id>', methods=['GET'])
+@main_bp.route('/product/<string:product_id>', methods=['GET'])
 def get_product_by_id(product_id):
-    return jsonify({'message': 'View specificated product'})
+    try:
+        oid = ObjectId(product_id)
+    except Exception as e:
+        return jsonify({'error': e})
+
+    product = db.products.find_one({'_id':oid})
+
+    if product:
+        product['_id'] = str(product['_id'])
+        return jsonify(product)
+    else:
+        return jsonify({'error': 'product not found'})
+    
 
 # FR: The system must allow the editing of a single, existing product.
 @main_bp.route('/product/<int:product_id>', methods=['PUT'])
