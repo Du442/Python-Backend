@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from fastapi import FastAPI
+from db import collection
 
 class Task(BaseModel):
     id: int
@@ -7,8 +8,6 @@ class Task(BaseModel):
     done: bool = False
 
 app = FastAPI()
-
-tasks = list()
 
 @app.get('/tasks')
 def get_tasks():
